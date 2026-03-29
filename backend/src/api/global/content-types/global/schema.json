@@ -1,0 +1,47 @@
+{
+  "kind": "singleType",
+  "collectionName": "globals",
+  "info": {
+    "singularName": "global",
+    "pluralName": "globals",
+    "displayName": "Global Settings",
+    "description": "Site-wide settings, navigation, and footer"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "siteName": {
+      "type": "string",
+      "required": true,
+      "default": "FindAnSEOAgency"
+    },
+    "siteDescription": {
+      "type": "text"
+    },
+    "navLinks": {
+      "type": "json"
+    },
+    "footerTagline": {
+      "type": "text"
+    },
+    "footerColumns": {
+      "type": "json"
+    },
+    "copyrightText": {
+      "type": "string"
+    },
+    "trustBarHeadline": {
+      "type": "string"
+    },
+    "newsletterTitle": {
+      "type": "string"
+    },
+    "newsletterDescription": {
+      "type": "text"
+    },
+    "newsletterPlaceholder": {
+      "type": "string"
+    }
+  }
+}

@@ -1,0 +1,209 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getPageBySlug, getServiceCategories, getAgencies, getTrustPartners } from '../lib/strapi';
+
+const page = await getPageBySlug('home');
+const services = await getServiceCategories();
+const agencies = await getAgencies();
+const trustPartners = await getTrustPartners();
+const featuredAgency = agencies?.find((a: any) => a.featured);
+const sections = page?.sections || {};
+---
+
+<Layout title={page?.seoTitle} description={page?.seoDescription} activeNav="/">
+  <main class="relative pt-24">
+    <!-- Hero Section -->
+    <section class="relative min-h-[870px] flex items-center overflow-hidden">
+      <div class="absolute inset-0 atmospheric-glow pointer-events-none"></div>
+      <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">
+        <div class="space-y-8">
+          {page?.heroEyebrow && (
+            <div class="inline-flex items-center space-x-2 px-3 py-1 bg-surface-container-low rounded-full border border-outline-variant/10">
+              <span class="w-2 h-2 rounded-full bg-primary-container"></span>
+              <span class="text-[10px] uppercase font-label font-bold tracking-[0.2em] text-on-surface-variant">{page.heroEyebrow}</span>
+            </div>
+          )}
+          <h1 class="font-headline text-6xl md:text-7xl font-bold leading-[1.05] tracking-tight text-on-surface">
+            {page?.heroTitle} <span class="text-primary italic">{page?.heroHighlight}</span>
+          </h1>
+          <p class="text-lg text-on-surface-variant max-w-lg leading-relaxed">{page?.heroDescription}</p>
+          <div class="flex flex-col sm:flex-row gap-4 pt-4">
+            {page?.heroPrimaryButtonText && (
+              <a href={page.heroPrimaryButtonLink || '/'} class="bg-primary-container text-on-primary-container px-8 py-4 rounded-full font-label font-bold text-sm tracking-wider flex items-center justify-center space-x-2 shadow-xl shadow-primary-container/20 hover:scale-105 transition-transform">
+                <span>{page.heroPrimaryButtonText}</span>
+                <span class="material-symbols-outlined text-xl">north_east</span>
+              </a>
+            )}
+            {page?.heroSecondaryButtonText && (
+              <a href={page.heroSecondaryButtonLink || '#'} class="glass-card px-8 py-4 rounded-full font-label font-bold text-sm tracking-wider text-on-surface hover:bg-white/90 transition-colors text-center">
+                {page.heroSecondaryButtonText}
+              </a>
+            )}
+          </div>
+        </div>
+        <div class="relative lg:scale-110">
+          <div class="absolute -top-12 -left-12 w-64 h-64 bg-primary-container/10 rounded-full blur-[100px]"></div>
+          {page?.heroImageUrl && (
+            <img alt="Future of SEO Hero" class="w-full aspect-square object-cover rounded-lg shadow-2xl relative z-10" src={page.heroImageUrl} />
+          )}
+        </div>
+      </div>
+    </section>
+
+    <!-- Trust Bar -->
+    {trustPartners && trustPartners.length > 0 && (
+      <section class="py-12 bg-surface-container-low">
+        <div class="max-w-7xl mx-auto px-6">
+          <div class="flex flex-col md:flex-row items-center justify-between gap-8">
+            <div class="flex flex-col items-center md:items-start space-y-2">
+              <div class="flex items-center space-x-1 text-primary">
+                {[1,2,3,4,5].map(() => (
+                  <span class="material-symbols-outlined filled">star</span>
+                ))}
+              </div>
+              <p class="font-label text-xs font-bold tracking-wider text-on-surface-variant uppercase">Trusted by 500+ Businesses</p>
+            </div>
+            <div class="flex flex-wrap justify-center gap-12 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
+              {trustPartners.map((partner: any) => (
+                <img alt={partner.name} class="h-6" src={partner.logoUrl} />
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+    )}
+
+    <!-- How It Works -->
+    {sections.howItWorks && (
+      <section id="how-it-works" class="py-24 bg-surface">
+        <div class="max-w-7xl mx-auto px-6">
+          <div class="mb-16 text-center max-w-2xl mx-auto">
+            <span class="font-label text-[10px] font-bold tracking-[0.3em] uppercase text-primary mb-4 block">Process</span>
+            <h2 class="font-headline text-4xl font-bold text-on-surface">Engineered for Success</h2>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {sections.howItWorks.map((step: any) => (
+              <div class="group p-8 rounded-lg bg-surface-container-low hover:bg-white transition-all duration-500 relative overflow-hidden">
+                <div class="absolute -right-4 -top-4 text-8xl font-headline font-bold text-on-surface/5 group-hover:text-primary/10 transition-colors">{step.step}</div>
+                <div class="mb-6 w-12 h-12 flex items-center justify-center rounded-xl bg-primary-container/10 text-primary-container">
+                  <span class="material-symbols-outlined">{step.icon}</span>
+                </div>
+                <h3 class="font-headline text-xl font-bold mb-4">{step.title}</h3>
+                <p class="text-on-surface-variant text-sm leading-relaxed">{step.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
+
+    <!-- Service Categories -->
+    {services && services.length > 0 && (
+      <section class="py-24 relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-1/2 h-full atmospheric-glow opacity-50 rotate-180 pointer-events-none"></div>
+        <div class="max-w-7xl mx-auto px-6 relative z-10">
+          <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
+            <div class="max-w-xl">
+              <span class="font-label text-[10px] font-bold tracking-[0.3em] uppercase text-primary mb-4 block">Specializations</span>
+              <h2 class="font-headline text-4xl font-bold text-on-surface leading-tight">Navigating the Complexity of Semantic Search</h2>
+            </div>
+            <button class="text-sm font-label font-bold text-primary group flex items-center space-x-2">
+              <span>View All Specialties</span>
+              <span class="material-symbols-outlined text-base group-hover:translate-x-1 transition-transform">arrow_forward</span>
+            </button>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {services.map((service: any) => (
+              <div class="glass-card p-1 rounded-lg group hover:scale-[1.02] transition-all">
+                <div class="bg-surface rounded-[calc(2rem-4px)] p-6 h-full flex flex-col justify-between">
+                  <div>
+                    <div class="mb-8 p-3 w-fit bg-surface-container-low rounded-lg group-hover:bg-primary-container/10 group-hover:text-primary transition-colors">
+                      <span class="material-symbols-outlined text-3xl">{service.icon}</span>
+                    </div>
+                    <h4 class="font-headline text-lg font-bold mb-3">{service.title}</h4>
+                    <p class="text-on-surface-variant text-xs font-body leading-relaxed">{service.description}</p>
+                  </div>
+                  <div class="mt-8 pt-6 border-t border-outline-variant/10 font-label text-[10px] font-bold tracking-widest text-on-surface-variant/50">{service.label}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
+
+    <!-- Featured Agency Bento Grid -->
+    {featuredAgency && (
+      <section class="py-24 bg-surface-container-low">
+        <div class="max-w-7xl mx-auto px-6">
+          <div class="mb-16">
+            <h2 class="font-headline text-4xl font-bold text-on-surface mb-4">Elite Partner Highlight</h2>
+            <p class="text-on-surface-variant">Top performers this month based on verified ROI data.</p>
+          </div>
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 auto-rows-[250px]">
+            <div class="lg:col-span-8 lg:row-span-2 glass-card rounded-lg overflow-hidden group relative">
+              {featuredAgency.imageUrl && (
+                <img alt="Agency Highlight" class="absolute inset-0 w-full h-full object-cover opacity-20 group-hover:scale-105 transition-transform duration-700" src={featuredAgency.imageUrl} />
+              )}
+              <div class="absolute inset-0 bg-gradient-to-t from-surface to-transparent"></div>
+              <div class="absolute bottom-0 left-0 p-10 flex flex-col justify-end">
+                <div class="flex items-center space-x-4 mb-4">
+                  {featuredAgency.logoUrl && (
+                    <div class="w-16 h-16 bg-white rounded-xl shadow-lg flex items-center justify-center p-2">
+                      <img alt={featuredAgency.name} class="w-full" src={featuredAgency.logoUrl} />
+                    </div>
+                  )}
+                  <div>
+                    <h3 class="font-headline text-2xl font-bold">{featuredAgency.name}</h3>
+                    <div class="flex items-center space-x-2">
+                      <span class="bg-primary/10 text-primary font-label text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase">{featuredAgency.badge}</span>
+                      {featuredAgency.retentionRate && <span class="text-on-surface-variant text-xs font-bold">{featuredAgency.retentionRate}</span>}
+                    </div>
+                  </div>
+                </div>
+                <p class="text-on-surface-variant max-w-lg mb-6 leading-relaxed">{featuredAgency.description}</p>
+                <button class="bg-primary text-on-primary px-8 py-3 rounded-full font-label font-bold text-sm w-fit">{featuredAgency.ctaText || 'View Profile'}</button>
+              </div>
+            </div>
+            {sections.eventCard && (
+              <div class="lg:col-span-4 lg:row-span-1 glass-card rounded-lg p-8 flex flex-col justify-between">
+                <div>
+                  <span class="font-label text-[10px] font-bold text-primary tracking-widest mb-2 block">{sections.eventCard.label}</span>
+                  <h4 class="font-headline text-lg font-bold">{sections.eventCard.title}</h4>
+                </div>
+                <div class="flex items-center justify-between text-xs text-on-surface-variant font-bold">
+                  <span>{sections.eventCard.date}</span>
+                  <span class="material-symbols-outlined">event</span>
+                </div>
+              </div>
+            )}
+            {sections.joinCard && (
+              <div class="lg:col-span-4 lg:row-span-1 bg-primary text-on-primary rounded-lg p-8 flex flex-col justify-between">
+                <h4 class="font-headline text-lg font-bold leading-tight">{sections.joinCard.title}</h4>
+                <div class="flex items-center space-x-2 group cursor-pointer">
+                  <span class="font-label font-bold text-sm">{sections.joinCard.buttonText}</span>
+                  <span class="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">chevron_right</span>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+    )}
+
+    <!-- CTA Section -->
+    {page?.ctaTitle && page.ctaStyle === 'newsletter' && (
+      <section class="py-32 relative overflow-hidden">
+        <div class="max-w-4xl mx-auto px-6 text-center relative z-10">
+          <h2 class="font-headline text-5xl md:text-6xl font-bold mb-8 text-on-surface tracking-tight" set:html={page.ctaTitle.replace('augmented', '<span class="text-primary italic">augmented</span>')} />
+          <p class="text-xl text-on-surface-variant mb-12 leading-relaxed">{page.ctaDescription}</p>
+          <div class="max-w-md mx-auto relative">
+            <input class="w-full bg-surface-container-lowest border-0 rounded-full py-5 px-8 shadow-2xl focus:ring-2 focus:ring-primary-container text-on-surface font-medium placeholder:text-on-surface-variant/40" placeholder="Enter your business email" type="email" />
+            <button class="absolute right-2 top-2 bg-primary-container text-on-primary-container px-6 py-3 rounded-full font-label font-bold text-xs uppercase tracking-widest hover:brightness-110 transition-all">{page.ctaButtonText}</button>
+          </div>
+        </div>
+        <div class="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-surface-container-low to-transparent"></div>
+      </section>
+    )}
+  </main>
+</Layout>

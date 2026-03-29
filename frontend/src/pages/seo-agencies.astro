@@ -1,0 +1,189 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getPageBySlug, getAgencies } from '../lib/strapi';
+
+const page = await getPageBySlug('seo-agencies');
+const agencies = await getAgencies();
+const nonFeaturedAgencies = agencies?.filter((a: any) => !a.featured) || [];
+const sections = page?.sections || {};
+const ec = sections.evaluationCriteria;
+const pricing = sections.pricing;
+
+const badgeColors: Record<string, string> = {
+  'premium': 'bg-secondary-container text-on-secondary-container',
+  'niche': 'bg-tertiary-container text-on-tertiary-container',
+  'data-driven': 'bg-surface-container text-on-surface-variant',
+};
+function getBadgeClass(style: string) {
+  return badgeColors[style] || badgeColors['premium'];
+}
+---
+
+<Layout title={page?.seoTitle} description={page?.seoDescription} activeNav="/seo-agencies">
+  <main class="pt-24">
+    <!-- Hero Section -->
+    <section class="relative px-6 py-20 md:py-32 overflow-hidden">
+      <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-primary-fixed/10 blur-[120px] rounded-full -mr-64 -mt-32"></div>
+      <div class="absolute bottom-0 left-0 w-[400px] h-[400px] bg-tertiary-fixed/10 blur-[100px] rounded-full -ml-32 -mb-32"></div>
+      <div class="max-w-7xl mx-auto relative z-10">
+        <div class="md:w-3/4">
+          {page?.heroEyebrow && (
+            <span class="inline-block font-label text-xs font-bold tracking-[0.2em] text-primary uppercase mb-6">{page.heroEyebrow}</span>
+          )}
+          <h1 class="font-headline text-5xl md:text-7xl font-bold tracking-tight text-on-surface mb-8 text-glow leading-[1.1]">
+            {page?.heroTitle} <span class="text-primary italic font-light">{page?.heroHighlight}</span>.
+          </h1>
+          <p class="font-body text-xl text-on-surface-variant leading-relaxed max-w-2xl mb-12">{page?.heroDescription}</p>
+          <div class="flex flex-wrap gap-4">
+            {page?.heroPrimaryButtonText && (
+              <a href={page.heroPrimaryButtonLink || '/'} class="bg-primary text-on-primary px-8 py-4 rounded-full font-label text-sm font-bold uppercase tracking-widest shadow-xl shadow-primary/20 hover:translate-y-[-2px] transition-all">
+                {page.heroPrimaryButtonText}
+              </a>
+            )}
+            {page?.heroSecondaryButtonText && (
+              <a href={page.heroSecondaryButtonLink || '#'} class="glass-card px-8 py-4 rounded-full font-label text-sm font-bold uppercase tracking-widest text-on-surface hover:bg-white/90 transition-all">
+                {page.heroSecondaryButtonText}
+              </a>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Agency Evaluation Criteria -->
+    {ec && (
+      <section class="px-6 py-24 bg-surface-container-low">
+        <div class="max-w-7xl mx-auto">
+          <div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+            <div>
+              <span class="font-label text-xs font-bold tracking-widest text-primary uppercase mb-4 block">{ec.sectionLabel}</span>
+              <h2 class="font-headline text-4xl font-bold text-on-surface">{ec.sectionTitle}</h2>
+            </div>
+            <p class="font-body text-on-surface-variant max-w-md">{ec.sectionDescription}</p>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+            {ec.mainCard && (
+              <div class="md:col-span-8 glass-card p-10 rounded-lg flex flex-col justify-between">
+                <div>
+                  <span class="material-symbols-outlined text-primary text-4xl mb-6">{ec.mainCard.icon}</span>
+                  <h3 class="font-headline text-2xl font-bold mb-4">{ec.mainCard.title}</h3>
+                  <p class="text-on-surface-variant leading-relaxed mb-8">{ec.mainCard.description}</p>
+                </div>
+                <ul class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {ec.mainCard.checklist?.map((item: string) => (
+                    <li class="flex items-center gap-3 font-label text-sm font-medium">
+                      <span class="material-symbols-outlined text-primary text-sm">check_circle</span> {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {ec.roiCard && (
+              <div class="md:col-span-4 bg-primary text-on-primary p-10 rounded-lg flex flex-col justify-center items-center text-center">
+                <div class="w-20 h-20 rounded-full bg-on-primary/10 flex items-center justify-center mb-6">
+                  <span class="material-symbols-outlined text-4xl filled">calculate</span>
+                </div>
+                <h3 class="font-headline text-2xl font-bold mb-4">{ec.roiCard.title}</h3>
+                <p class="opacity-90 text-sm leading-relaxed mb-8">{ec.roiCard.description}</p>
+                <button class="w-full bg-white text-primary py-3 rounded-full font-label text-xs font-bold uppercase tracking-tighter">{ec.roiCard.buttonText}</button>
+              </div>
+            )}
+            {ec.smallCards?.map((card: any) => (
+              <div class="md:col-span-4 glass-card p-10 rounded-lg">
+                <span class="material-symbols-outlined text-secondary text-4xl mb-6">{card.icon}</span>
+                <h3 class="font-headline text-xl font-bold mb-2">{card.title}</h3>
+                <p class="text-on-surface-variant text-sm leading-relaxed">{card.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
+
+    <!-- Top Rated Agencies -->
+    {nonFeaturedAgencies.length > 0 && (
+      <section class="px-6 py-24 bg-surface">
+        <div class="max-w-7xl mx-auto">
+          <div class="mb-16">
+            <h2 class="font-headline text-4xl font-bold text-on-surface mb-4">Top Rated Agencies</h2>
+            <p class="text-on-surface-variant">Hand-picked industry leaders vetted for performance and reliability.</p>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {nonFeaturedAgencies.map((agency: any) => (
+                <div class="group bg-surface-container-low rounded-lg p-1 overflow-hidden transition-all hover:shadow-2xl hover:shadow-primary/5">
+                  <div class="bg-surface-container-lowest rounded-[calc(2rem-4px)] p-8 h-full flex flex-col">
+                    <div class="flex justify-between items-start mb-8">
+                      <div class="w-16 h-16 rounded-lg bg-zinc-100 flex items-center justify-center grayscale group-hover:grayscale-0 transition-all">
+                        <span class="material-symbols-outlined text-3xl text-zinc-400">{agency.icon}</span>
+                      </div>
+                      <div class={`${getBadgeClass(agency.badgeStyle)} px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest`}>{agency.badge}</div>
+                    </div>
+                    <h3 class="font-headline text-2xl font-bold mb-3">{agency.name}</h3>
+                    <p class="font-body text-on-surface-variant text-sm leading-relaxed mb-8 flex-grow">{agency.description}</p>
+                    <div class="pt-6 border-t border-surface-container flex items-center justify-between">
+                      <span class="font-label text-xs font-bold text-primary">VIEW PROFILE</span>
+                      <div class="flex items-center gap-1">
+                        <span class="material-symbols-outlined text-tertiary-fixed text-sm filled">star</span>
+                        <span class="font-label text-xs font-bold">{agency.rating}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
+
+    <!-- Pricing Breakdown -->
+    {pricing && (
+      <section class="px-6 py-24 bg-surface-container-low overflow-hidden relative">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 items-center gap-16">
+          <div>
+            <h2 class="font-headline text-4xl font-bold text-on-surface mb-6">{pricing.title} <br/><span class="text-primary">{pricing.highlight}</span></h2>
+            <p class="font-body text-on-surface-variant mb-10 leading-relaxed">{pricing.description}</p>
+            <div class="space-y-4 mb-10">
+              {pricing.items?.map((item: any) => (
+                <div class="flex items-center gap-4 p-4 rounded-lg bg-surface-container-lowest border border-white/50">
+                  <span class="material-symbols-outlined text-primary">{item.icon}</span>
+                  <span class="font-medium text-sm">{item.text}</span>
+                </div>
+              ))}
+            </div>
+            <button class="bg-on-surface text-surface-bright px-8 py-4 rounded-full font-label text-xs font-bold uppercase tracking-widest hover:bg-zinc-800 transition-colors">
+              {pricing.buttonText}
+            </button>
+          </div>
+          <div class="relative">
+            <div class="bg-surface-container-highest rounded-lg p-10 shadow-2xl relative z-10">
+              <div class="flex items-center justify-between mb-8">
+                <div class="font-headline text-lg font-bold">Cost Analysis</div>
+                <div class="flex gap-2">
+                  <div class="w-3 h-3 rounded-full bg-error-container"></div>
+                  <div class="w-3 h-3 rounded-full bg-tertiary-container"></div>
+                  <div class="w-3 h-3 rounded-full bg-secondary-fixed"></div>
+                </div>
+              </div>
+              <div class="space-y-6">
+                <div class="h-4 w-full bg-surface-container rounded-full overflow-hidden"><div class="h-full bg-primary-fixed w-3/4"></div></div>
+                <div class="h-4 w-full bg-surface-container rounded-full overflow-hidden"><div class="h-full bg-primary-fixed w-1/2"></div></div>
+                <div class="h-4 w-full bg-surface-container rounded-full overflow-hidden"><div class="h-full bg-primary-fixed w-5/6"></div></div>
+              </div>
+              {pricing.stats && (
+                <div class="mt-12 grid grid-cols-2 gap-4">
+                  {pricing.stats.map((stat: any) => (
+                    <div class="p-4 rounded-sm bg-surface text-center">
+                      <div class="font-label text-[10px] text-on-surface-variant uppercase">{stat.label}</div>
+                      <div class="font-headline text-2xl font-bold text-primary">{stat.value}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div class="absolute -top-12 -right-12 w-64 h-64 border-[32px] border-primary-fixed/5 rounded-full z-0"></div>
+          </div>
+        </div>
+      </section>
+    )}
+  </main>
+</Layout>

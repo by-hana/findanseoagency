@@ -1,0 +1,104 @@
+---
+import '../styles/global.css';
+import { getGlobal } from '../lib/strapi';
+
+interface Props {
+  title?: string;
+  description?: string;
+  activeNav?: string;
+}
+
+const { title = 'FindAnSEOAgency', description = '', activeNav = '' } = Astro.props;
+
+let global: any = null;
+try {
+  global = await getGlobal();
+} catch (e) {
+  console.warn('Could not fetch global settings from Strapi');
+}
+
+const siteName = global?.siteName || 'FindAnSEOAgency';
+const navLinks = global?.navLinks || [
+  { label: 'Agencies', href: '/' },
+  { label: 'AI Optimization', href: '/ai-optimization' },
+  { label: 'SEO Basics', href: '/seo-agencies' },
+  { label: 'Blog', href: '/blog' },
+];
+const footerTagline = global?.footerTagline || 'Curating the world\'s most sophisticated digital search partners for the intelligence era.';
+const footerColumns = global?.footerColumns || [];
+const copyrightText = global?.copyrightText || '© 2024 FindAnSEOAgency. All rights reserved.';
+---
+
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{title}</title>
+  {description && <meta name="description" content={description} />}
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary-container selection:text-on-primary-container overflow-x-hidden">
+
+  <!-- Navigation -->
+  <nav class="fixed top-0 w-full z-50 bg-white/70 backdrop-blur-xl border-b border-white/20 shadow-sm">
+    <div class="flex justify-between items-center px-6 py-4 max-w-7xl mx-auto w-full">
+      <a href="/" class="text-xl font-bold tracking-tighter text-zinc-900 font-headline">{siteName}</a>
+      <div class="hidden md:flex items-center space-x-8 font-headline text-sm tracking-tight">
+        {navLinks.map((link: any) => (
+          <a
+            class={activeNav === link.href
+              ? 'text-orange-600 font-semibold border-b-2 border-orange-600'
+              : 'text-zinc-600 hover:text-zinc-900 transition-colors'}
+            href={link.href}
+          >
+            {link.label}
+          </a>
+        ))}
+      </div>
+      <a href="/" class="bg-primary hover:bg-primary-dim text-on-primary px-6 py-2.5 rounded-full font-label text-sm font-semibold tracking-wide active:scale-90 transition-transform">
+        Search Agencies
+      </a>
+    </div>
+  </nav>
+
+  <slot />
+
+  <!-- Footer -->
+  <footer class="bg-zinc-50 w-full pt-16 pb-8">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-12 px-6 max-w-7xl mx-auto font-body text-sm leading-relaxed">
+      <div class="col-span-2 md:col-span-1">
+        <div class="text-lg font-bold text-zinc-900 font-headline mb-6">{siteName}</div>
+        <p class="text-zinc-500 max-w-xs mb-8">{footerTagline}</p>
+        <div class="flex space-x-4">
+          <a class="w-8 h-8 rounded-full bg-zinc-200 flex items-center justify-center text-zinc-600 hover:bg-orange-600 hover:text-white transition-colors" href="#">
+            <span class="material-symbols-outlined text-sm">public</span>
+          </a>
+          <a class="w-8 h-8 rounded-full bg-zinc-200 flex items-center justify-center text-zinc-600 hover:bg-orange-600 hover:text-white transition-colors" href="#">
+            <span class="material-symbols-outlined text-sm">share</span>
+          </a>
+        </div>
+      </div>
+      {footerColumns.map((col: any) => (
+        <div>
+          <h5 class="font-headline font-bold text-zinc-900 mb-6">{col.title}</h5>
+          <ul class="space-y-4">
+            {col.links.map((link: any) => (
+              <li>
+                <a class="text-zinc-500 hover:text-orange-500 transition-colors hover:translate-x-1 inline-block" href={link.href}>
+                  {link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+    <div class="mt-16 pt-8 border-t border-zinc-100 text-center">
+      <p class="text-zinc-400 text-xs">{copyrightText}</p>
+    </div>
+  </footer>
+
+</body>
+</html>

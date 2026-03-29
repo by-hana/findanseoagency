@@ -1,0 +1,26 @@
+{
+  "kind": "collectionType",
+  "collectionName": "trust_partners",
+  "info": {
+    "singularName": "trust-partner",
+    "pluralName": "trust-partners",
+    "displayName": "Trust Partner",
+    "description": "Trust bar partner logos"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "logoUrl": {
+      "type": "string"
+    },
+    "order": {
+      "type": "integer",
+      "default": 0
+    }
+  }
+}

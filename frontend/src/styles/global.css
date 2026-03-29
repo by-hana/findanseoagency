@@ -1,0 +1,97 @@
+@import "tailwindcss";
+
+@theme {
+  --font-headline: "Space Grotesk", sans-serif;
+  --font-body: "Manrope", sans-serif;
+  --font-label: "Space Grotesk", sans-serif;
+
+  --color-surface: #f9f6f5;
+  --color-surface-container-low: #f3f0ef;
+  --color-surface-container: #eae7e7;
+  --color-surface-container-high: #e5e2e1;
+  --color-surface-container-highest: #dfdcdc;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-dim: #d6d4d3;
+  --color-surface-bright: #f9f6f5;
+  --color-surface-variant: #dfdcdc;
+
+  --color-on-surface: #2f2e2e;
+  --color-on-surface-variant: #5c5b5b;
+  --color-on-background: #2f2e2e;
+  --color-background: #f9f6f5;
+
+  --color-primary: #9c3f00;
+  --color-primary-dim: #893600;
+  --color-primary-container: #ff7a2f;
+  --color-primary-fixed: #ff7a2f;
+  --color-primary-fixed-dim: #f66700;
+  --color-on-primary: #fff0ea;
+  --color-on-primary-container: #401500;
+  --color-on-primary-fixed: #000000;
+
+  --color-secondary: #904800;
+  --color-secondary-dim: #7e3e00;
+  --color-secondary-container: #ffc69f;
+  --color-secondary-fixed: #ffc69f;
+  --color-secondary-fixed-dim: #ffb37d;
+  --color-on-secondary: #fff0e8;
+  --color-on-secondary-container: #723700;
+
+  --color-tertiary: #7a5400;
+  --color-tertiary-dim: #6b4900;
+  --color-tertiary-container: #fbb423;
+  --color-tertiary-fixed: #fbb423;
+  --color-tertiary-fixed-dim: #eba60f;
+  --color-on-tertiary: #fff1df;
+  --color-on-tertiary-container: #523700;
+
+  --color-outline: #787676;
+  --color-outline-variant: #afacac;
+
+  --color-inverse-surface: #0e0e0e;
+  --color-inverse-on-surface: #9e9c9c;
+  --color-inverse-primary: #fe6b00;
+
+  --color-error: #b02500;
+  --color-error-dim: #b92902;
+  --color-error-container: #f95630;
+  --color-on-error: #ffefec;
+  --color-on-error-container: #520c00;
+
+  --color-surface-tint: #9c3f00;
+
+  --radius-DEFAULT: 1rem;
+  --radius-lg: 2rem;
+  --radius-xl: 3rem;
+}
+
+/* Glass card effect */
+.glass-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  border: 0.5px solid rgba(255, 255, 255, 0.5);
+}
+
+/* Atmospheric glow */
+.atmospheric-glow {
+  background: radial-gradient(circle at center, rgba(255, 122, 47, 0.08) 0%, rgba(249, 246, 245, 0) 70%);
+}
+
+/* Hero glow */
+.hero-glow {
+  background: radial-gradient(60% 60% at 50% 50%, rgba(255, 122, 47, 0.08) 0%, rgba(249, 246, 245, 0) 100%);
+}
+
+/* Text glow */
+.text-glow {
+  text-shadow: 0 0 30px rgba(255, 122, 47, 0.2);
+}
+
+/* Material Symbols defaults */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.material-symbols-outlined.filled {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}

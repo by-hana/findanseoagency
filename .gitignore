@@ -1,0 +1,32 @@
+node_modules/
+.env
+.env.local
+dist/
+.astro/
+.cache/
+.tmp/
+build/
+.strapi/
+*.db
+*.db-journal
+
+# Strapi
+backend/node_modules/
+backend/.cache/
+backend/.tmp/
+backend/build/
+backend/dist/
+backend/.strapi/
+backend/.env
+
+# Astro frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.astro/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Stitch export (source reference, not needed in prod)
+stitch_findanseoagency_landing_page/
