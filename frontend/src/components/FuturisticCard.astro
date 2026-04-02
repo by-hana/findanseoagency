@@ -1,0 +1,159 @@
+---
+/**
+ * FuturisticCard — Reusable notched/scooped corner card
+ *
+ * Each corner can independently be:
+ *   'round'  → convex outward curve (normal border-radius feel)
+ *   'notch'  → concave inward scoop (futuristic cut)
+ *   'sharp'  → hard 90-degree angle
+ *
+ * The ONLY difference between convex and concave in the SVG path
+ * is the arc sweep-flag: 1 = outward, 0 = inward.
+ */
+interface Props {
+  /** Convex corner radius in px */
+  cornerRadius?: number;
+  /** Concave notch radius in px */
+  notchSize?: number;
+  /** Border stroke width in px */
+  borderWidth?: number;
+  /** Fill color (any CSS color) */
+  background?: string;
+  /** Border color ('none' to disable) */
+  borderColor?: string;
+  /** CSS padding for content area */
+  padding?: string;
+  /**
+   * Corner config: 'tl tr br bl'
+   * Each: 'round' | 'notch' | 'sharp'
+   * Single value applies to all four.
+   * Example: 'notch round round notch'
+   */
+  corners?: string;
+  class?: string;
+}
+
+const {
+  cornerRadius = 20,
+  notchSize = 28,
+  borderWidth = 1,
+  background = 'rgba(255,255,255,0.92)',
+  borderColor = 'rgba(255,255,255,0.15)',
+  padding = '1rem',
+  corners = 'round round round round',
+  class: className = '',
+} = Astro.props;
+---
+
+<div
+  class:list={['fc-wrap relative', className]}
+  data-fc-cr={cornerRadius}
+  data-fc-ns={notchSize}
+  data-fc-bw={borderWidth}
+  data-fc-bg={background}
+  data-fc-bc={borderColor}
+  data-fc-corners={corners}
+>
+  <!-- Shape SVG: background fill + border stroke -->
+  <svg class="fc-svg absolute inset-0 w-full h-full" style="z-index:0; overflow:visible;" aria-hidden="true">
+    <path class="fc-fill" />
+    <path class="fc-stroke" fill="none" />
+  </svg>
+
+  <!-- Content: clipped to the same shape -->
+  <div class="fc-content relative" style={`padding:${padding}; z-index:1;`}>
+    <slot />
+  </div>
+</div>
+
+<script>
+  /**
+   * ════════════════════════════════════════════════
+   * EDIT SHAPE VALUES via component props.
+   * The path math lives here — sweep-flag is the
+   * only thing that flips between convex & concave.
+   * ════════════════════════════════════════════════
+   */
+  function fcPath(
+    w: number, h: number,
+    cr: number, ns: number,
+    corners: string[]
+  ): string {
+    const c = corners.map(t => {
+      if (t === 'sharp') return { r: 0, s: 1 };
+      if (t === 'notch') return { r: ns, s: 0 }; // ← sweep 0 = concave inward
+      return { r: cr, s: 1 };                     // ← sweep 1 = convex outward
+    });
+    const [tl, tr, br, bl] = c;
+
+    /* Path traces clockwise:
+       start after TL corner → top edge → TR → right edge →
+       BR → bottom edge → BL → left edge → back to TL */
+    return [
+      `M ${tl.r} 0`,
+      `L ${w - tr.r} 0`,
+      tr.r ? `A ${tr.r} ${tr.r} 0 0 ${tr.s} ${w} ${tr.r}` : `L ${w} 0`,
+      `L ${w} ${h - br.r}`,
+      br.r ? `A ${br.r} ${br.r} 0 0 ${br.s} ${w - br.r} ${h}` : `L ${w} ${h}`,
+      `L ${bl.r} ${h}`,
+      bl.r ? `A ${bl.r} ${bl.r} 0 0 ${bl.s} 0 ${h - bl.r}` : `L 0 ${h}`,
+      `L 0 ${tl.r}`,
+      tl.r ? `A ${tl.r} ${tl.r} 0 0 ${tl.s} ${tl.r} 0` : '',
+      'Z'
+    ].filter(Boolean).join(' ');
+  }
+
+  function fcInit(wrap: HTMLElement) {
+    if (wrap.dataset.fcReady) return;
+    wrap.dataset.fcReady = '1';
+
+    const fill = wrap.querySelector('.fc-fill') as SVGPathElement;
+    const stroke = wrap.querySelector('.fc-stroke') as SVGPathElement;
+    const content = wrap.querySelector('.fc-content') as HTMLElement;
+    if (!fill) return;
+
+    function update() {
+      const w = wrap.offsetWidth;
+      const h = wrap.offsetHeight;
+      if (!w || !h) return;
+
+      const cr = +(wrap.dataset.fcCr || 20);
+      const ns = +(wrap.dataset.fcNs || 28);
+      const bw = +(wrap.dataset.fcBw || 1);
+      const bg = wrap.dataset.fcBg || 'rgba(255,255,255,0.92)';
+      const bc = wrap.dataset.fcBc || 'none';
+      const raw = (wrap.dataset.fcCorners || 'round').trim().split(/\s+/);
+      const corners = raw.length === 4 ? raw : [raw[0], raw[0], raw[0], raw[0]];
+
+      // Main fill shape
+      const d = fcPath(w, h, cr, ns, corners);
+      fill.setAttribute('d', d);
+      fill.setAttribute('fill', bg);
+
+      // Border: same shape, inset by half stroke
+      if (stroke && bc !== 'none') {
+        const half = bw / 2;
+        const dB = fcPath(w - bw, h - bw, Math.max(0, cr - half), Math.max(0, ns - half), corners);
+        stroke.setAttribute('d', dB);
+        stroke.setAttribute('stroke', bc);
+        stroke.setAttribute('stroke-width', String(bw));
+        stroke.setAttribute('transform', `translate(${half},${half})`);
+        stroke.style.display = '';
+      } else if (stroke) {
+        stroke.style.display = 'none';
+      }
+
+      // Clip content to the shape
+      if (content) content.style.clipPath = `path('${d}')`;
+    }
+
+    update();
+    new ResizeObserver(update).observe(wrap);
+  }
+
+  function fcInitAll() {
+    document.querySelectorAll<HTMLElement>('.fc-wrap').forEach(fcInit);
+  }
+  fcInitAll();
+  document.addEventListener('astro:page-load', fcInitAll);
+</script>

@@ -8,182 +8,229 @@ const nonFeaturedAgencies = agencies?.filter((a: any) => !a.featured) || [];
 const sections = page?.sections || {};
 const ec = sections.evaluationCriteria;
 const pricing = sections.pricing;
-
-const badgeColors: Record<string, string> = {
-  'premium': 'bg-secondary-container text-on-secondary-container',
-  'niche': 'bg-tertiary-container text-on-tertiary-container',
-  'data-driven': 'bg-surface-container text-on-surface-variant',
-};
-function getBadgeClass(style: string) {
-  return badgeColors[style] || badgeColors['premium'];
-}
 ---
 
 <Layout title={page?.seoTitle} description={page?.seoDescription} activeNav="/seo-agencies">
-  <main class="pt-24">
-    <!-- Hero Section -->
-    <section class="relative px-6 py-20 md:py-32 overflow-hidden">
-      <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-primary-fixed/10 blur-[120px] rounded-full -mr-64 -mt-32"></div>
-      <div class="absolute bottom-0 left-0 w-[400px] h-[400px] bg-tertiary-fixed/10 blur-[100px] rounded-full -ml-32 -mb-32"></div>
-      <div class="max-w-7xl mx-auto relative z-10">
-        <div class="md:w-3/4">
-          {page?.heroEyebrow && (
-            <span class="inline-block font-label text-xs font-bold tracking-[0.2em] text-primary uppercase mb-6">{page.heroEyebrow}</span>
+  <main>
+
+    <!-- ═══════ HERO — Dark mesh, huge type ═══════ -->
+    <section class="relative min-h-[90vh] flex items-end mesh-dark grain overflow-hidden">
+      <div class="absolute top-[30%] right-[10%] w-56 h-56 bg-orange/6 blur-[100px] rounded-full float pointer-events-none"></div>
+
+      <div class="relative z-[3] px-6 md:px-10 pb-16 md:pb-24 max-w-4xl">
+        {page?.heroEyebrow && (
+          <span class="section-label text-orange-light mb-4 block">{page.heroEyebrow}</span>
+        )}
+        <h1 class="font-display text-[clamp(2.8rem,7vw,7rem)] font-700 tracking-tight leading-[0.88] text-on-dark">
+          {page?.heroTitle}<br/>
+          {page?.heroHighlight && (
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange to-orange-light">{page.heroHighlight}</span>
           )}
-          <h1 class="font-headline text-5xl md:text-7xl font-bold tracking-tight text-on-surface mb-8 text-glow leading-[1.1]">
-            {page?.heroTitle} <span class="text-primary italic font-light">{page?.heroHighlight}</span>.
-          </h1>
-          <p class="font-body text-xl text-on-surface-variant leading-relaxed max-w-2xl mb-12">{page?.heroDescription}</p>
-          <div class="flex flex-wrap gap-4">
-            {page?.heroPrimaryButtonText && (
-              <a href={page.heroPrimaryButtonLink || '/'} class="bg-primary text-on-primary px-8 py-4 rounded-full font-label text-sm font-bold uppercase tracking-widest shadow-xl shadow-primary/20 hover:translate-y-[-2px] transition-all">
-                {page.heroPrimaryButtonText}
-              </a>
-            )}
-            {page?.heroSecondaryButtonText && (
-              <a href={page.heroSecondaryButtonLink || '#'} class="glass-card px-8 py-4 rounded-full font-label text-sm font-bold uppercase tracking-widest text-on-surface hover:bg-white/90 transition-all">
-                {page.heroSecondaryButtonText}
-              </a>
-            )}
-          </div>
+        </h1>
+        <p class="text-on-dark-muted text-lg leading-relaxed max-w-xl mt-8">{page?.heroDescription}</p>
+        <div class="flex flex-wrap gap-4 mt-10">
+          {page?.heroPrimaryButtonText && (
+            <a href={page.heroPrimaryButtonLink || '/'} class="bg-orange hover:bg-orange-dim text-white px-8 py-4 rounded-full font-display text-sm font-500 cursor-pointer transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,95,0,0.3)]">
+              {page.heroPrimaryButtonText}
+            </a>
+          )}
+          {page?.heroSecondaryButtonText && (
+            <a href={page.heroSecondaryButtonLink || '#'} class="bg-white/5 backdrop-blur border border-white/10 text-on-dark px-8 py-4 rounded-full font-display text-sm font-500 cursor-pointer transition-all duration-300 hover:border-orange/30">
+              {page.heroSecondaryButtonText}
+            </a>
+          )}
         </div>
       </div>
+      <div class="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-cream to-transparent z-[2]"></div>
     </section>
 
-    <!-- Agency Evaluation Criteria -->
+
+    <!-- ═══════ EVALUATION — Full bleed with overlapping layout ═══════ -->
     {ec && (
-      <section class="px-6 py-24 bg-surface-container-low">
-        <div class="max-w-7xl mx-auto">
-          <div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
-            <div>
-              <span class="font-label text-xs font-bold tracking-widest text-primary uppercase mb-4 block">{ec.sectionLabel}</span>
-              <h2 class="font-headline text-4xl font-bold text-on-surface">{ec.sectionTitle}</h2>
-            </div>
-            <p class="font-body text-on-surface-variant max-w-md">{ec.sectionDescription}</p>
+      <section class="py-24 md:py-36 px-6 md:px-10 relative">
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-20">
+          <div>
+            <span class="section-label">{ec.sectionLabel}</span>
+            <h2 class="font-display text-5xl md:text-7xl font-700 tracking-tight text-dark leading-[0.9] mt-4">{ec.sectionTitle}</h2>
           </div>
-          <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
-            {ec.mainCard && (
-              <div class="md:col-span-8 glass-card p-10 rounded-lg flex flex-col justify-between">
-                <div>
-                  <span class="material-symbols-outlined text-primary text-4xl mb-6">{ec.mainCard.icon}</span>
-                  <h3 class="font-headline text-2xl font-bold mb-4">{ec.mainCard.title}</h3>
-                  <p class="text-on-surface-variant leading-relaxed mb-8">{ec.mainCard.description}</p>
-                </div>
-                <ul class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <p class="text-ink-light max-w-md leading-relaxed">{ec.sectionDescription}</p>
+        </div>
+
+        {ec.mainCard && (
+          <div class="relative mb-6">
+            <!-- Main card spans full width, visually heavy -->
+            <div class="bg-dark text-on-dark rounded-3xl p-10 md:p-16 relative overflow-hidden grain">
+              <div class="absolute top-0 right-0 w-[400px] h-[400px] bg-orange/5 blur-[150px] rounded-full pointer-events-none"></div>
+              <div class="relative z-[2] max-w-3xl">
+                <h3 class="font-display text-3xl md:text-4xl font-600 mb-4">{ec.mainCard.title}</h3>
+                <p class="text-on-dark-muted leading-relaxed mb-10 max-w-xl">{ec.mainCard.description}</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4">
                   {ec.mainCard.checklist?.map((item: string) => (
-                    <li class="flex items-center gap-3 font-label text-sm font-medium">
-                      <span class="material-symbols-outlined text-primary text-sm">check_circle</span> {item}
-                    </li>
+                    <div class="flex items-center gap-3">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FF5F00" stroke-width="2" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>
+                      <span class="text-on-dark text-sm">{item}</span>
+                    </div>
                   ))}
-                </ul>
-              </div>
-            )}
-            {ec.roiCard && (
-              <div class="md:col-span-4 bg-primary text-on-primary p-10 rounded-lg flex flex-col justify-center items-center text-center">
-                <div class="w-20 h-20 rounded-full bg-on-primary/10 flex items-center justify-center mb-6">
-                  <span class="material-symbols-outlined text-4xl filled">calculate</span>
                 </div>
-                <h3 class="font-headline text-2xl font-bold mb-4">{ec.roiCard.title}</h3>
-                <p class="opacity-90 text-sm leading-relaxed mb-8">{ec.roiCard.description}</p>
-                <button class="w-full bg-white text-primary py-3 rounded-full font-label text-xs font-bold uppercase tracking-tighter">{ec.roiCard.buttonText}</button>
+              </div>
+            </div>
+
+            {/* ROI card overlapping the main card */}
+            {ec.roiCard && (
+              <div class="md:absolute md:-bottom-12 md:right-10 md:w-80 mt-6 md:mt-0 z-10">
+                <div class="bg-orange text-white rounded-2xl p-8 relative overflow-hidden stack-card">
+                  <div class="absolute inset-0 opacity-10" aria-hidden="true">
+                    <svg width="100%" height="100%"><pattern id="roi-lines" width="30" height="30" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="30" stroke="white" stroke-width="0.5"/></pattern><rect width="100%" height="100%" fill="url(#roi-lines)"/></svg>
+                  </div>
+                  <div class="relative z-[2]">
+                    <div class="w-12 h-12 rounded-full bg-white/15 flex items-center justify-center mb-5">
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    </div>
+                    <h3 class="font-display text-xl font-600 mb-2">{ec.roiCard.title}</h3>
+                    <p class="text-white/80 text-sm leading-relaxed mb-6">{ec.roiCard.description}</p>
+                    <button class="w-full bg-white text-orange py-3 rounded-full font-display text-sm font-500 cursor-pointer hover:bg-white/90 transition-colors duration-300">{ec.roiCard.buttonText}</button>
+                  </div>
+                </div>
               </div>
             )}
-            {ec.smallCards?.map((card: any) => (
-              <div class="md:col-span-4 glass-card p-10 rounded-lg">
-                <span class="material-symbols-outlined text-secondary text-4xl mb-6">{card.icon}</span>
-                <h3 class="font-headline text-xl font-bold mb-2">{card.title}</h3>
-                <p class="text-on-surface-variant text-sm leading-relaxed">{card.description}</p>
+          </div>
+        )}
+
+        {/* Small cards below with offset */}
+        {ec.smallCards && (
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-20">
+            {ec.smallCards.map((card: any, i: number) => (
+              <div class={`stack-card bg-cream-dark rounded-3xl p-8 md:p-10 ${i === 1 ? 'md:-mt-4' : ''}`}>
+                <span class="font-display text-5xl font-700 text-warm-gray leading-none">0{i + 1}</span>
+                <h3 class="font-display text-xl font-600 text-dark mt-6 mb-3">{card.title}</h3>
+                <p class="text-ink-light text-sm leading-relaxed">{card.description}</p>
               </div>
             ))}
           </div>
-        </div>
+        )}
       </section>
     )}
 
-    <!-- Top Rated Agencies -->
+
+    <!-- ═══════ TOP AGENCIES — Interactive list ═══════ -->
     {nonFeaturedAgencies.length > 0 && (
-      <section class="px-6 py-24 bg-surface">
-        <div class="max-w-7xl mx-auto">
-          <div class="mb-16">
-            <h2 class="font-headline text-4xl font-bold text-on-surface mb-4">Top Rated Agencies</h2>
-            <p class="text-on-surface-variant">Hand-picked industry leaders vetted for performance and reliability.</p>
-          </div>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {nonFeaturedAgencies.map((agency: any) => (
-                <div class="group bg-surface-container-low rounded-lg p-1 overflow-hidden transition-all hover:shadow-2xl hover:shadow-primary/5">
-                  <div class="bg-surface-container-lowest rounded-[calc(2rem-4px)] p-8 h-full flex flex-col">
-                    <div class="flex justify-between items-start mb-8">
-                      <div class="w-16 h-16 rounded-lg bg-zinc-100 flex items-center justify-center grayscale group-hover:grayscale-0 transition-all">
-                        <span class="material-symbols-outlined text-3xl text-zinc-400">{agency.icon}</span>
-                      </div>
-                      <div class={`${getBadgeClass(agency.badgeStyle)} px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest`}>{agency.badge}</div>
-                    </div>
-                    <h3 class="font-headline text-2xl font-bold mb-3">{agency.name}</h3>
-                    <p class="font-body text-on-surface-variant text-sm leading-relaxed mb-8 flex-grow">{agency.description}</p>
-                    <div class="pt-6 border-t border-surface-container flex items-center justify-between">
-                      <span class="font-label text-xs font-bold text-primary">VIEW PROFILE</span>
+      <section class="bg-dark text-on-dark py-24 md:py-36 px-6 md:px-10 relative overflow-hidden grain">
+        <div class="absolute top-0 left-0 w-[400px] h-[400px] bg-orange/5 blur-[200px] rounded-full pointer-events-none"></div>
+
+        <div class="flex flex-col md:flex-row md:items-end gap-6 mb-20 relative z-[2]">
+          <span class="section-label text-orange-light">01</span>
+          <h2 class="font-display text-5xl md:text-7xl font-700 tracking-tight leading-[0.9]">Top rated</h2>
+        </div>
+
+        <div class="divide-y divide-dark-border relative z-[2]">
+          {nonFeaturedAgencies.map((agency: any, i: number) => (
+            <div class="service-row group py-10">
+              <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div class="flex items-center gap-6 md:gap-10">
+                  <span class="font-mono text-[11px] text-on-dark-muted">0{i + 1}</span>
+                  <div>
+                    <h3 class="font-display text-2xl md:text-4xl font-600 group-hover:text-orange transition-colors duration-400">{agency.name}</h3>
+                    <div class="flex items-center gap-4 mt-2">
+                      <span class="font-mono text-[9px] tracking-[0.2em] uppercase text-orange bg-orange/10 px-2.5 py-1 rounded-full">{agency.badge}</span>
                       <div class="flex items-center gap-1">
-                        <span class="material-symbols-outlined text-tertiary-fixed text-sm filled">star</span>
-                        <span class="font-label text-xs font-bold">{agency.rating}</span>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="#FF5F00"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                        <span class="font-mono text-[11px] text-on-dark-muted">{agency.rating}</span>
                       </div>
                     </div>
                   </div>
                 </div>
-            ))}
-          </div>
+                <svg class="text-on-dark-faint group-hover:text-orange group-hover:rotate-[-45deg] transition-all duration-500 flex-shrink-0" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </div>
+              <div class="service-desc text-on-dark-muted text-sm max-w-xl ml-[calc(1.5rem+2.5rem)] md:ml-[calc(2.5rem+4rem)] leading-relaxed">
+                {agency.description}
+              </div>
+            </div>
+          ))}
         </div>
       </section>
     )}
 
-    <!-- Pricing Breakdown -->
+
+    <!-- ═══════ PRICING — Split layout with visual chart ═══════ -->
     {pricing && (
-      <section class="px-6 py-24 bg-surface-container-low overflow-hidden relative">
-        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 items-center gap-16">
-          <div>
-            <h2 class="font-headline text-4xl font-bold text-on-surface mb-6">{pricing.title} <br/><span class="text-primary">{pricing.highlight}</span></h2>
-            <p class="font-body text-on-surface-variant mb-10 leading-relaxed">{pricing.description}</p>
+      <section class="relative overflow-hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-2 min-h-[80vh]">
+          <!-- Left: content -->
+          <div class="px-6 md:px-10 lg:px-16 py-16 md:py-24 flex flex-col justify-center">
+            <span class="section-label mb-4">02 — Investment</span>
+            <h2 class="font-display text-4xl md:text-5xl font-700 tracking-tight text-dark leading-[0.95]">
+              {pricing.title}<br/>
+              {pricing.highlight && <span class="text-orange">{pricing.highlight}</span>}
+            </h2>
+            <p class="text-ink-light mt-6 mb-10 leading-relaxed max-w-md">{pricing.description}</p>
+
             <div class="space-y-4 mb-10">
-              {pricing.items?.map((item: any) => (
-                <div class="flex items-center gap-4 p-4 rounded-lg bg-surface-container-lowest border border-white/50">
-                  <span class="material-symbols-outlined text-primary">{item.icon}</span>
-                  <span class="font-medium text-sm">{item.text}</span>
+              {pricing.items?.map((item: any, i: number) => (
+                <div class="flex items-center gap-4 group cursor-pointer">
+                  <div class="flex-shrink-0 w-8 h-8 rounded-full bg-orange/10 flex items-center justify-center group-hover:bg-orange/20 transition-colors duration-300">
+                    <span class="font-mono text-[10px] font-600 text-orange">0{i + 1}</span>
+                  </div>
+                  <span class="text-ink font-500 group-hover:text-orange transition-colors duration-300">{item.text}</span>
                 </div>
               ))}
             </div>
-            <button class="bg-on-surface text-surface-bright px-8 py-4 rounded-full font-label text-xs font-bold uppercase tracking-widest hover:bg-zinc-800 transition-colors">
+
+            <button class="bg-dark text-white px-8 py-4 rounded-full font-display text-sm font-500 cursor-pointer transition-all duration-300 hover:shadow-[0_20px_40px_rgba(11,11,11,0.2)] w-fit">
               {pricing.buttonText}
             </button>
           </div>
-          <div class="relative">
-            <div class="bg-surface-container-highest rounded-lg p-10 shadow-2xl relative z-10">
-              <div class="flex items-center justify-between mb-8">
-                <div class="font-headline text-lg font-bold">Cost Analysis</div>
+
+          <!-- Right: dark visual panel -->
+          <div class="bg-dark text-on-dark p-10 md:p-16 flex flex-col justify-center relative overflow-hidden grain">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-orange/8 blur-[120px] rounded-full pointer-events-none"></div>
+
+            <div class="relative z-[2]">
+              <div class="flex items-center justify-between mb-12">
+                <span class="font-display text-xl font-600">Cost Analysis</span>
                 <div class="flex gap-2">
-                  <div class="w-3 h-3 rounded-full bg-error-container"></div>
-                  <div class="w-3 h-3 rounded-full bg-tertiary-container"></div>
-                  <div class="w-3 h-3 rounded-full bg-secondary-fixed"></div>
+                  <div class="w-3 h-3 rounded-full bg-orange pulse-glow"></div>
+                  <div class="w-3 h-3 rounded-full bg-orange-light opacity-60"></div>
+                  <div class="w-3 h-3 rounded-full bg-dark-border"></div>
                 </div>
               </div>
-              <div class="space-y-6">
-                <div class="h-4 w-full bg-surface-container rounded-full overflow-hidden"><div class="h-full bg-primary-fixed w-3/4"></div></div>
-                <div class="h-4 w-full bg-surface-container rounded-full overflow-hidden"><div class="h-full bg-primary-fixed w-1/2"></div></div>
-                <div class="h-4 w-full bg-surface-container rounded-full overflow-hidden"><div class="h-full bg-primary-fixed w-5/6"></div></div>
+
+              <!-- Animated bars -->
+              <div class="space-y-8">
+                <div>
+                  <div class="flex justify-between font-mono text-[10px] tracking-[0.15em] text-on-dark-muted mb-3"><span>TECHNICAL SEO</span><span class="text-orange">75%</span></div>
+                  <div class="h-1.5 w-full bg-dark-elevated rounded-full overflow-hidden">
+                    <div class="h-full bg-gradient-to-r from-orange to-orange-light rounded-full" style="width:75%; animation: slideIn 1s ease-out forwards;"></div>
+                  </div>
+                </div>
+                <div>
+                  <div class="flex justify-between font-mono text-[10px] tracking-[0.15em] text-on-dark-muted mb-3"><span>CONTENT STRATEGY</span><span class="text-orange-light">50%</span></div>
+                  <div class="h-1.5 w-full bg-dark-elevated rounded-full overflow-hidden">
+                    <div class="h-full bg-gradient-to-r from-orange-light to-orange rounded-full" style="width:50%; animation: slideIn 1.2s ease-out forwards;"></div>
+                  </div>
+                </div>
+                <div>
+                  <div class="flex justify-between font-mono text-[10px] tracking-[0.15em] text-on-dark-muted mb-3"><span>AI INTEGRATION</span><span class="text-orange">85%</span></div>
+                  <div class="h-1.5 w-full bg-dark-elevated rounded-full overflow-hidden">
+                    <div class="h-full bg-gradient-to-r from-orange to-orange-light rounded-full" style="width:85%; animation: slideIn 1.4s ease-out forwards;"></div>
+                  </div>
+                </div>
               </div>
+
               {pricing.stats && (
-                <div class="mt-12 grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-2 gap-4 mt-14">
                   {pricing.stats.map((stat: any) => (
-                    <div class="p-4 rounded-sm bg-surface text-center">
-                      <div class="font-label text-[10px] text-on-surface-variant uppercase">{stat.label}</div>
-                      <div class="font-headline text-2xl font-bold text-primary">{stat.value}</div>
+                    <div class="p-5 rounded-2xl bg-dark-elevated text-center">
+                      <div class="font-mono text-[9px] tracking-[0.2em] text-on-dark-faint uppercase">{stat.label}</div>
+                      <div class="font-display text-3xl font-700 text-orange mt-2">{stat.value}</div>
                     </div>
                   ))}
                 </div>
               )}
             </div>
-            <div class="absolute -top-12 -right-12 w-64 h-64 border-[32px] border-primary-fixed/5 rounded-full z-0"></div>
           </div>
         </div>
       </section>
     )}
+
   </main>
 </Layout>

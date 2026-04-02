@@ -1,17 +1,19 @@
 const STRAPI_URL = import.meta.env.STRAPI_URL || 'http://localhost:1337';
 
 export async function fetchFromStrapi(endpoint: string, params?: Record<string, string>) {
-  const url = new URL(`/api/${endpoint}`, STRAPI_URL);
-  if (params) {
-    Object.entries(params).forEach(([key, value]) => url.searchParams.set(key, value));
-  }
+  try {
+    const url = new URL(`/api/${endpoint}`, STRAPI_URL);
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => url.searchParams.set(key, value));
+    }
 
-  const res = await fetch(url.toString());
-  if (!res.ok) {
-    throw new Error(`Failed to fetch ${endpoint}: ${res.status} ${res.statusText}`);
+    const res = await fetch(url.toString());
+    if (!res.ok) return null;
+    const json = await res.json();
+    return json.data;
+  } catch {
+    return null;
   }
-  const json = await res.json();
-  return json.data;
 }
 
 export async function getGlobal() {

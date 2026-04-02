@@ -1,0 +1,192 @@
+---
+interface Props {
+  radius?: number;
+  notch?: number;
+  bg?: string;
+  borderColor?: string;
+  borderWidth?: number;
+  padding?: string;
+  notches?: string;
+  class?: string;
+}
+
+const {
+  radius = 24,
+  notch = 20,
+  bg = '#0B0B0B',
+  borderColor = 'none',
+  borderWidth = 2,
+  padding = '',
+  notches = 'none',
+  class: className = '',
+} = Astro.props;
+---
+
+<div
+  class:list={['notched-card-wrapper relative', className]}
+  data-nc-radius={radius}
+  data-nc-notch={notch}
+  data-nc-bg={bg}
+  data-nc-border-color={borderColor}
+  data-nc-border-width={borderWidth}
+  data-nc-notches={notches}
+>
+  {/* Border SVG — lives OUTSIDE the clipped card so it isn't clipped */}
+  <svg
+    class="nc-border-svg absolute inset-0 w-full h-full pointer-events-none"
+    style="z-index:1; overflow:visible;"
+    aria-hidden="true"
+  >
+    <path class="nc-border-path" fill="none" />
+  </svg>
+
+  {/* Card body — clip-path is applied here by the script */}
+  <div
+    class="nc-body relative"
+    style={`background:${bg};${padding ? ` padding:${padding};` : ''} z-index:2;`}
+  >
+    <slot />
+  </div>
+</div>
+
+<script>
+  function buildPath(
+    w: number,
+    h: number,
+    r: number,
+    n: number,
+    notches: string[]
+  ): string {
+    // notches = [tl, tr, br, bl]
+    // Each value: 'round' (convex), 'notch' (concave), 'none' (sharp)
+    const corners = notches.map((type) => {
+      if (type === 'none') return { r: 0, s: 1 };
+      if (type === 'notch') return { r: n, s: 0 }; // sweep 0 = concave
+      return { r: r, s: 1 }; // sweep 1 = convex
+    });
+
+    const [tl, tr, br, bl] = corners;
+
+    const parts: string[] = [];
+
+    // Start after TL corner, on the top edge
+    parts.push(`M ${tl.r} 0`);
+
+    // Top edge -> TR corner
+    parts.push(`L ${w - tr.r} 0`);
+    if (tr.r > 0) {
+      parts.push(`A ${tr.r} ${tr.r} 0 0 ${tr.s} ${w} ${tr.r}`);
+    } else {
+      parts.push(`L ${w} 0`);
+    }
+
+    // Right edge -> BR corner
+    parts.push(`L ${w} ${h - br.r}`);
+    if (br.r > 0) {
+      parts.push(`A ${br.r} ${br.r} 0 0 ${br.s} ${w - br.r} ${h}`);
+    } else {
+      parts.push(`L ${w} ${h}`);
+    }
+
+    // Bottom edge -> BL corner
+    parts.push(`L ${bl.r} ${h}`);
+    if (bl.r > 0) {
+      parts.push(`A ${bl.r} ${bl.r} 0 0 ${bl.s} 0 ${h - bl.r}`);
+    } else {
+      parts.push(`L 0 ${h}`);
+    }
+
+    // Left edge -> TL corner (close the shape)
+    parts.push(`L 0 ${tl.r}`);
+    if (tl.r > 0) {
+      parts.push(`A ${tl.r} ${tl.r} 0 0 ${tl.s} ${tl.r} 0`);
+    }
+
+    parts.push('Z');
+    return parts.join(' ');
+  }
+
+  function initNotchedCard(wrapper: HTMLElement) {
+    if (wrapper.dataset.ncReady) return;
+    wrapper.dataset.ncReady = '1';
+
+    const body = wrapper.querySelector('.nc-body') as HTMLElement;
+    const borderPath = wrapper.querySelector('.nc-border-path') as SVGPathElement | null;
+
+    if (!body) return;
+
+    function update() {
+      const w = wrapper.offsetWidth;
+      const h = wrapper.offsetHeight;
+      if (w === 0 || h === 0) return;
+
+      const r = parseFloat(wrapper.dataset.ncRadius || '24');
+      const n = parseFloat(wrapper.dataset.ncNotch || '20');
+      const notchStr = wrapper.dataset.ncNotches || 'none';
+      const borderColor = wrapper.dataset.ncBorderColor || 'none';
+      const borderW = parseFloat(wrapper.dataset.ncBorderWidth || '2');
+
+      // Parse notches string: 'round round notch notch' -> ['round','round','notch','notch']
+      // A single value like 'none' means all corners
+      const parts = notchStr.trim().split(/\s+/);
+      let notches: string[];
+      if (parts.length === 1) {
+        notches = [parts[0], parts[0], parts[0], parts[0]];
+      } else if (parts.length === 4) {
+        notches = parts;
+      } else {
+        // Pad with 'none' if incomplete
+        notches = [
+          parts[0] || 'none',
+          parts[1] || 'none',
+          parts[2] || 'none',
+          parts[3] || 'none',
+        ];
+      }
+
+      const d = buildPath(w, h, r, n, notches);
+
+      // Apply clip-path to the card body
+      body.style.clipPath = `path('${d}')`;
+
+      // Size the body to fill the wrapper
+      body.style.width = '100%';
+      body.style.minHeight = '100%';
+
+      // Update border SVG
+      if (borderPath && borderColor !== 'none') {
+        // Inset the border path by half the stroke width so the stroke
+        // doesn't get cut off at the edges
+        const bw2 = borderW / 2;
+        const bW = w - borderW;
+        const bH = h - borderW;
+        const bD = buildPath(bW, bH, r, n, notches);
+
+        borderPath.setAttribute('d', bD);
+        borderPath.setAttribute('stroke', borderColor);
+        borderPath.setAttribute('stroke-width', String(borderW));
+        borderPath.setAttribute('transform', `translate(${bw2}, ${bw2})`);
+        borderPath.style.display = '';
+      } else if (borderPath) {
+        borderPath.style.display = 'none';
+      }
+    }
+
+    // Initial update
+    update();
+
+    // Re-calc on resize via ResizeObserver
+    const ro = new ResizeObserver(() => update());
+    ro.observe(wrapper);
+  }
+
+  function initAll() {
+    document.querySelectorAll<HTMLElement>('.notched-card-wrapper').forEach(initNotchedCard);
+  }
+
+  // Run immediately
+  initAll();
+
+  // Also run after Astro client-side navigation
+  document.addEventListener('astro:page-load', initAll);
+</script>

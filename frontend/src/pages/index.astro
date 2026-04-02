@@ -7,203 +7,522 @@ const services = await getServiceCategories();
 const agencies = await getAgencies();
 const trustPartners = await getTrustPartners();
 const featuredAgency = agencies?.find((a: any) => a.featured);
+const otherAgencies = agencies?.filter((a: any) => !a.featured)?.slice(0, 3) || [];
 const sections = page?.sections || {};
 ---
 
 <Layout title={page?.seoTitle} description={page?.seoDescription} activeNav="/">
-  <main class="relative pt-24">
-    <!-- Hero Section -->
-    <section class="relative min-h-[870px] flex items-center overflow-hidden">
-      <div class="absolute inset-0 atmospheric-glow pointer-events-none"></div>
-      <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">
-        <div class="space-y-8">
-          {page?.heroEyebrow && (
-            <div class="inline-flex items-center space-x-2 px-3 py-1 bg-surface-container-low rounded-full border border-outline-variant/10">
-              <span class="w-2 h-2 rounded-full bg-primary-container"></span>
-              <span class="text-[10px] uppercase font-label font-bold tracking-[0.2em] text-on-surface-variant">{page.heroEyebrow}</span>
-            </div>
-          )}
-          <h1 class="font-headline text-6xl md:text-7xl font-bold leading-[1.05] tracking-tight text-on-surface">
-            {page?.heroTitle} <span class="text-primary italic">{page?.heroHighlight}</span>
-          </h1>
-          <p class="text-lg text-on-surface-variant max-w-lg leading-relaxed">{page?.heroDescription}</p>
-          <div class="flex flex-col sm:flex-row gap-4 pt-4">
-            {page?.heroPrimaryButtonText && (
-              <a href={page.heroPrimaryButtonLink || '/'} class="bg-primary-container text-on-primary-container px-8 py-4 rounded-full font-label font-bold text-sm tracking-wider flex items-center justify-center space-x-2 shadow-xl shadow-primary-container/20 hover:scale-105 transition-transform">
-                <span>{page.heroPrimaryButtonText}</span>
-                <span class="material-symbols-outlined text-xl">north_east</span>
-              </a>
-            )}
-            {page?.heroSecondaryButtonText && (
-              <a href={page.heroSecondaryButtonLink || '#'} class="glass-card px-8 py-4 rounded-full font-label font-bold text-sm tracking-wider text-on-surface hover:bg-white/90 transition-colors text-center">
-                {page.heroSecondaryButtonText}
-              </a>
-            )}
-          </div>
-        </div>
-        <div class="relative lg:scale-110">
-          <div class="absolute -top-12 -left-12 w-64 h-64 bg-primary-container/10 rounded-full blur-[100px]"></div>
-          {page?.heroImageUrl && (
-            <img alt="Future of SEO Hero" class="w-full aspect-square object-cover rounded-lg shadow-2xl relative z-10" src={page.heroImageUrl} />
-          )}
-        </div>
-      </div>
-    </section>
+  <main>
 
-    <!-- Trust Bar -->
-    {trustPartners && trustPartners.length > 0 && (
-      <section class="py-12 bg-surface-container-low">
-        <div class="max-w-7xl mx-auto px-6">
-          <div class="flex flex-col md:flex-row items-center justify-between gap-8">
-            <div class="flex flex-col items-center md:items-start space-y-2">
-              <div class="flex items-center space-x-1 text-primary">
-                {[1,2,3,4,5].map(() => (
-                  <span class="material-symbols-outlined filled">star</span>
+    <!-- ═══════════════════════════════════════
+         HERO — Full viewport, animated mesh bg,
+         huge display type, floating search
+    ═══════════════════════════════════════ -->
+    <!-- ═══════ HERO WRAPPER — 100vh with equal padding ═══════ -->
+    <div class="h-screen p-3 md:p-5 flex flex-col">
+    <section id="hero" class="mesh-dark grain relative overflow-hidden flex-grow rounded-[1.5rem] md:rounded-[2rem]" style="border-bottom-right-radius: 0;">
+      <canvas id="hero-canvas" class="absolute inset-0 z-[1]" aria-hidden="true"></canvas>
+
+      <!-- Hero content -->
+      <div class="relative z-[3] flex flex-col justify-end h-full px-8 md:px-14 pb-40">
+        {page?.heroEyebrow && (
+          <div class="section-label text-orange-light mb-6">{page.heroEyebrow}</div>
+        )}
+        <h1 class="font-display text-[clamp(2.8rem,7vw,7rem)] font-700 leading-[0.9] tracking-tight text-on-dark">
+          {page?.heroTitle}{' '}
+          {page?.heroHighlight && (
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange to-orange-light">{page.heroHighlight}</span>
+          )}
+        </h1>
+        <p class="mt-10 text-on-dark-muted text-lg max-w-md leading-relaxed">{page?.heroDescription}</p>
+      </div>
+
+      <!-- Trust bar: cream channel + white ribbed glass, bottom-right of hero -->
+      <div class="absolute bottom-0 right-0 z-[4] w-[58%] md:w-[45%]">
+        <!-- Concave scoop: top of trust bar, right edge of hero -->
+        <div class="absolute w-[24px] h-[24px] bg-cream z-[5]" style="bottom: 100%; right: 0; clip-path: path('M 0 0 L 24 0 A 24 24 0 0 0 0 24 Z'); transform: scaleX(-1) scaleY(-1);"></div>
+        <div class="relative pl-3 pt-3 bg-cream" style="border-top-left-radius: 1.5rem;">
+
+          <!-- Concave corner: left of cream channel -->
+          <div class="absolute w-[24px] h-[24px] bg-cream" style="bottom: 0; right: 100%; clip-path: path('M 24 24 L 0 24 A 24 24 0 0 0 24 0 Z');"></div>
+
+
+          <!-- Trust bar: white ribbed glass -->
+          <div class="relative overflow-hidden bg-cream" style="border-top-left-radius: 1rem;">
+            <div class="relative z-[2] py-5 overflow-hidden">
+              <div class="marquee-track" style="animation-duration: 40s;">
+                {[...Array(6)].map(() => (
+                  <span class="flex items-center gap-3 mx-8 flex-shrink-0 whitespace-nowrap">
+                    <svg viewBox="0 0 36 36" fill="none" class="w-7 h-7 flex-shrink-0" style="animation: pulseRing 4s ease-in-out infinite;">
+                      <path d="M18 3 L30 9 L30 18 C30 25.5 24.6 31.5 18 33 C11.4 31.5 6 25.5 6 18 L6 9 Z" fill="#FF5F00" opacity="0.12"/>
+                      <path d="M18 3 L30 9 L30 18 C30 25.5 24.6 31.5 18 33 C11.4 31.5 6 25.5 6 18 L6 9 Z" stroke="#FF5F00" stroke-width="1.5" fill="none"/>
+                      <path d="M13 18 L16.5 21.5 L23 14.5" stroke="#FF5F00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span class="font-display text-base md:text-lg font-600 text-ink tracking-tight trust-shimmer">Brought to you by experts in the field</span>
+                  </span>
                 ))}
               </div>
-              <p class="font-label text-xs font-bold tracking-wider text-on-surface-variant uppercase">Trusted by 500+ Businesses</p>
-            </div>
-            <div class="flex flex-wrap justify-center gap-12 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
-              {trustPartners.map((partner: any) => (
-                <img alt={partner.name} class="h-6" src={partner.logoUrl} />
-              ))}
             </div>
           </div>
         </div>
-      </section>
-    )}
+      </div>
 
-    <!-- How It Works -->
-    {sections.howItWorks && (
-      <section id="how-it-works" class="py-24 bg-surface">
-        <div class="max-w-7xl mx-auto px-6">
-          <div class="mb-16 text-center max-w-2xl mx-auto">
-            <span class="font-label text-[10px] font-bold tracking-[0.3em] uppercase text-primary mb-4 block">Process</span>
-            <h2 class="font-headline text-4xl font-bold text-on-surface">Engineered for Success</h2>
-          </div>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {sections.howItWorks.map((step: any) => (
-              <div class="group p-8 rounded-lg bg-surface-container-low hover:bg-white transition-all duration-500 relative overflow-hidden">
-                <div class="absolute -right-4 -top-4 text-8xl font-headline font-bold text-on-surface/5 group-hover:text-primary/10 transition-colors">{step.step}</div>
-                <div class="mb-6 w-12 h-12 flex items-center justify-center rounded-xl bg-primary-container/10 text-primary-container">
-                  <span class="material-symbols-outlined">{step.icon}</span>
-                </div>
-                <h3 class="font-headline text-xl font-bold mb-4">{step.title}</h3>
-                <p class="text-on-surface-variant text-sm leading-relaxed">{step.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-    )}
+    </section>
+    </div><!-- end hero wrapper -->
 
-    <!-- Service Categories -->
+
+    <!-- ═══════════════════════════════════════
+         SERVICES — Interactive text list
+         No cards. Hover reveals description.
+    ═══════════════════════════════════════ -->
     {services && services.length > 0 && (
-      <section class="py-24 relative overflow-hidden">
-        <div class="absolute top-0 right-0 w-1/2 h-full atmospheric-glow opacity-50 rotate-180 pointer-events-none"></div>
-        <div class="max-w-7xl mx-auto px-6 relative z-10">
-          <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
-            <div class="max-w-xl">
-              <span class="font-label text-[10px] font-bold tracking-[0.3em] uppercase text-primary mb-4 block">Specializations</span>
-              <h2 class="font-headline text-4xl font-bold text-on-surface leading-tight">Navigating the Complexity of Semantic Search</h2>
+      <section class="pt-28 md:pt-36 pb-24 md:pb-36 px-6 md:px-10">
+        <div class="flex flex-col md:flex-row md:items-end gap-6 mb-16">
+          <span class="section-label">01</span>
+          <h2 class="font-display text-5xl md:text-7xl font-700 tracking-tight text-dark leading-[0.9]">What you'll find here</h2>
+        </div>
+
+        <div class="divide-y divide-warm-gray">
+          {services.map((service: any, i: number) => (
+            <div class="service-row group py-8 md:py-10">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-6 md:gap-10">
+                  <span class="font-mono text-[11px] text-ink-muted">0{i + 1}</span>
+                  <h3 class="font-display text-2xl md:text-4xl font-600 text-dark group-hover:text-orange transition-colors duration-400">{service.title}</h3>
+                </div>
+                <div class="flex items-center gap-4">
+                  <span class="hidden md:block font-mono text-[10px] tracking-[0.15em] uppercase text-ink-muted">{service.label}</span>
+                  <svg class="text-ink-faint group-hover:text-orange group-hover:rotate-[-45deg] transition-all duration-500" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </div>
+              </div>
+              <div class="service-desc text-ink-light text-sm md:text-base max-w-xl ml-[calc(1.5rem+2.5rem)] md:ml-[calc(2.5rem+3.5rem)] leading-relaxed">
+                {service.description}
+              </div>
             </div>
-            <button class="text-sm font-label font-bold text-primary group flex items-center space-x-2">
-              <span>View All Specialties</span>
-              <span class="material-symbols-outlined text-base group-hover:translate-x-1 transition-transform">arrow_forward</span>
+          ))}
+        </div>
+      </section>
+    )}
+
+
+    <!-- ═══════════════════════════════════════
+         PROCESS — Dark section, large numbers,
+         stacking layers
+    ═══════════════════════════════════════ -->
+    {sections.howItWorks && (
+      <section class="bg-dark text-on-dark relative grain">
+        <!-- Ambient glow -->
+        <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-orange/5 blur-[200px] rounded-full pointer-events-none"></div>
+
+        <!-- Section header -->
+        <div class="pt-24 md:pt-36 pb-12 px-6 md:px-10">
+          <div class="flex flex-col md:flex-row md:items-end gap-6">
+            <span class="section-label text-orange-light">02</span>
+            <h2 class="font-display text-5xl md:text-7xl font-700 tracking-tight leading-[0.9]">How it works</h2>
+          </div>
+        </div>
+
+        <!-- Stacking cards container -->
+        <div class="relative z-[2] px-6 md:px-10 pb-24 md:pb-36">
+          {sections.howItWorks.map((step: any, i: number) => (
+            <div class="sticky h-[60vh] md:h-[50vh] mb-6" style={`top: calc(6rem + ${i * 2.5}rem);`}>
+              <div class="bg-dark-elevated border border-dark-border rounded-3xl p-8 md:p-12 h-full flex flex-col md:flex-row gap-8 md:gap-14 items-start md:items-center relative overflow-hidden" style={`box-shadow: 0 -8px 30px rgba(0,0,0,${0.3 + i * 0.15});`}>
+                <!-- Subtle top glow -->
+                <div class="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-orange/15 to-transparent"></div>
+
+                <!-- Huge number -->
+                <div class="flex-shrink-0">
+                  <span class="font-display text-[5rem] md:text-[8rem] font-700 leading-none text-transparent bg-clip-text bg-gradient-to-b from-orange/40 to-dark-border">{step.step}</span>
+                </div>
+                <!-- Content -->
+                <div class="flex-grow">
+                  <h3 class="font-display text-2xl md:text-4xl font-600 mb-4">{step.title}</h3>
+                  <p class="text-on-dark-muted text-base md:text-lg leading-relaxed max-w-lg">{step.description}</p>
+                </div>
+                <!-- Icon -->
+                <div class="flex-shrink-0 w-16 h-16 rounded-2xl bg-dark border border-dark-border flex items-center justify-center">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FF5F00" stroke-width="1.5" stroke-linecap="round">
+                    {i === 0 && <><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></>}
+                    {i === 1 && <><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></>}
+                    {i === 2 && <><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></>}
+                  </svg>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    )}
+
+
+    <!-- ═══════════════════════════════════════
+         FEATURED AGENCY — Full bleed,
+         image background, overlapping elements
+    ═══════════════════════════════════════ -->
+    {featuredAgency && (
+      <section class="relative min-h-[80vh] flex items-end overflow-hidden">
+        <!-- Background image with duotone -->
+        {featuredAgency.imageUrl ? (
+          <img alt="" class="absolute inset-0 w-full h-full object-cover" src={featuredAgency.imageUrl} aria-hidden="true" />
+        ) : (
+          <div class="absolute inset-0 bg-dark-surface"></div>
+        )}
+        <div class="absolute inset-0 bg-gradient-to-t from-dark via-dark/90 to-dark/30"></div>
+        <div class="absolute inset-0 bg-orange/5 mix-blend-multiply"></div>
+
+        <!-- Content overlaid -->
+        <div class="relative z-10 w-full px-6 md:px-10 pb-16 md:pb-24 pt-40">
+          <div class="flex flex-col md:flex-row md:items-end justify-between gap-10">
+            <div class="max-w-2xl">
+              <span class="section-label text-orange-light">03 — Featured</span>
+              <h2 class="font-display text-5xl md:text-8xl font-700 tracking-tight text-on-dark leading-[0.9] mt-4">
+                {featuredAgency.name}
+              </h2>
+              <div class="flex items-center gap-4 mt-4">
+                <span class="font-mono text-[10px] tracking-[0.2em] uppercase text-orange bg-orange/15 px-3 py-1 rounded-full">{featuredAgency.badge}</span>
+                {featuredAgency.retentionRate && (
+                  <span class="font-mono text-[10px] tracking-wider text-on-dark-muted">{featuredAgency.retentionRate} retention</span>
+                )}
+              </div>
+              <p class="text-on-dark-muted text-lg leading-relaxed mt-6 max-w-lg">{featuredAgency.description}</p>
+            </div>
+            <button class="bg-orange hover:bg-orange-dim text-white px-8 py-4 rounded-full font-display text-sm font-500 cursor-pointer transition-all duration-300 hover:shadow-[0_0_40px_rgba(255,95,0,0.3)] whitespace-nowrap self-start md:self-end">
+              {featuredAgency.ctaText || 'View Profile'}
             </button>
           </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {services.map((service: any) => (
-              <div class="glass-card p-1 rounded-lg group hover:scale-[1.02] transition-all">
-                <div class="bg-surface rounded-[calc(2rem-4px)] p-6 h-full flex flex-col justify-between">
-                  <div>
-                    <div class="mb-8 p-3 w-fit bg-surface-container-low rounded-lg group-hover:bg-primary-container/10 group-hover:text-primary transition-colors">
-                      <span class="material-symbols-outlined text-3xl">{service.icon}</span>
-                    </div>
-                    <h4 class="font-headline text-lg font-bold mb-3">{service.title}</h4>
-                    <p class="text-on-surface-variant text-xs font-body leading-relaxed">{service.description}</p>
-                  </div>
-                  <div class="mt-8 pt-6 border-t border-outline-variant/10 font-label text-[10px] font-bold tracking-widest text-on-surface-variant/50">{service.label}</div>
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
       </section>
     )}
 
-    <!-- Featured Agency Bento Grid -->
-    {featuredAgency && (
-      <section class="py-24 bg-surface-container-low">
-        <div class="max-w-7xl mx-auto px-6">
-          <div class="mb-16">
-            <h2 class="font-headline text-4xl font-bold text-on-surface mb-4">Elite Partner Highlight</h2>
-            <p class="text-on-surface-variant">Top performers this month based on verified ROI data.</p>
-          </div>
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 auto-rows-[250px]">
-            <div class="lg:col-span-8 lg:row-span-2 glass-card rounded-lg overflow-hidden group relative">
-              {featuredAgency.imageUrl && (
-                <img alt="Agency Highlight" class="absolute inset-0 w-full h-full object-cover opacity-20 group-hover:scale-105 transition-transform duration-700" src={featuredAgency.imageUrl} />
-              )}
-              <div class="absolute inset-0 bg-gradient-to-t from-surface to-transparent"></div>
-              <div class="absolute bottom-0 left-0 p-10 flex flex-col justify-end">
-                <div class="flex items-center space-x-4 mb-4">
-                  {featuredAgency.logoUrl && (
-                    <div class="w-16 h-16 bg-white rounded-xl shadow-lg flex items-center justify-center p-2">
-                      <img alt={featuredAgency.name} class="w-full" src={featuredAgency.logoUrl} />
-                    </div>
-                  )}
-                  <div>
-                    <h3 class="font-headline text-2xl font-bold">{featuredAgency.name}</h3>
-                    <div class="flex items-center space-x-2">
-                      <span class="bg-primary/10 text-primary font-label text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase">{featuredAgency.badge}</span>
-                      {featuredAgency.retentionRate && <span class="text-on-surface-variant text-xs font-bold">{featuredAgency.retentionRate}</span>}
-                    </div>
-                  </div>
+
+    <!-- ═══════════════════════════════════════
+         MORE AGENCIES — Stacking cards
+    ═══════════════════════════════════════ -->
+    {otherAgencies.length > 0 && (
+      <section id="top-rated" class="py-24 md:py-32 px-6 md:px-10 bg-dark text-on-dark relative overflow-hidden grain">
+        <!-- Ambient canvas -->
+        <canvas id="rated-canvas" class="absolute inset-0 z-0" aria-hidden="true"></canvas>
+
+        <div class="flex flex-col md:flex-row md:items-end gap-6 mb-16 relative z-[2]">
+          <span class="section-label text-orange-light">04</span>
+          <h2 class="font-display text-5xl md:text-7xl font-700 tracking-tight leading-[0.9]">Top rated</h2>
+        </div>
+
+        <!-- Stacking/overlapping cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-[2]">
+          {otherAgencies.map((agency: any, i: number) => (
+            <div class={`stack-card bg-dark-elevated/80 backdrop-blur-sm rounded-3xl p-8 md:p-10 cursor-pointer relative overflow-hidden ${i === 1 ? 'md:-mt-6' : ''} ${i === 2 ? 'md:mt-3' : ''}`}>
+              <!-- Accent glow top -->
+              <div class="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-orange/30 to-transparent"></div>
+              <div class="absolute -top-20 left-1/2 -translate-x-1/2 w-40 h-20 bg-orange/8 blur-[40px] rounded-full pointer-events-none"></div>
+
+              <div class="flex items-center justify-between mb-8 relative z-[2]">
+                <span class="font-mono text-[10px] tracking-[0.2em] uppercase text-on-dark-muted">0{i + 1}</span>
+                <div class="flex items-center gap-1">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="#FF5F00"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  <span class="font-mono text-sm font-500">{agency.rating}</span>
                 </div>
-                <p class="text-on-surface-variant max-w-lg mb-6 leading-relaxed">{featuredAgency.description}</p>
-                <button class="bg-primary text-on-primary px-8 py-3 rounded-full font-label font-bold text-sm w-fit">{featuredAgency.ctaText || 'View Profile'}</button>
+              </div>
+
+              <h3 class="font-display text-2xl font-600 mb-3 relative z-[2]">{agency.name}</h3>
+              <p class="text-on-dark-muted text-sm leading-relaxed mb-8 relative z-[2]">{agency.description}</p>
+
+              <div class="flex items-center justify-between pt-6 border-t border-dark-border relative z-[2]">
+                <span class="font-mono text-[9px] tracking-[0.2em] uppercase text-orange">{agency.badge}</span>
+                <svg class="text-on-dark-faint" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
               </div>
             </div>
-            {sections.eventCard && (
-              <div class="lg:col-span-4 lg:row-span-1 glass-card rounded-lg p-8 flex flex-col justify-between">
-                <div>
-                  <span class="font-label text-[10px] font-bold text-primary tracking-widest mb-2 block">{sections.eventCard.label}</span>
-                  <h4 class="font-headline text-lg font-bold">{sections.eventCard.title}</h4>
-                </div>
-                <div class="flex items-center justify-between text-xs text-on-surface-variant font-bold">
-                  <span>{sections.eventCard.date}</span>
-                  <span class="material-symbols-outlined">event</span>
-                </div>
+          ))}
+        </div>
+      </section>
+    )}
+
+
+    <!-- ═══════════════════════════════════════
+         SIDE PANELS — Event + Join CTA
+    ═══════════════════════════════════════ -->
+    {(sections.eventCard || sections.joinCard) && (
+      <section class="px-6 md:px-10 pb-24 bg-cream-dark">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {sections.eventCard && (
+            <div class="bg-dark text-on-dark rounded-3xl p-10 md:p-14 flex flex-col justify-between min-h-[280px] relative overflow-hidden grain">
+              <div class="absolute top-0 right-0 w-48 h-48 bg-orange/8 blur-[80px] rounded-full pointer-events-none"></div>
+              <div class="relative z-[2]">
+                <span class="section-label text-orange-light">{sections.eventCard.label}</span>
+                <h4 class="font-display text-3xl md:text-4xl font-600 mt-4 leading-tight">{sections.eventCard.title}</h4>
               </div>
-            )}
-            {sections.joinCard && (
-              <div class="lg:col-span-4 lg:row-span-1 bg-primary text-on-primary rounded-lg p-8 flex flex-col justify-between">
-                <h4 class="font-headline text-lg font-bold leading-tight">{sections.joinCard.title}</h4>
-                <div class="flex items-center space-x-2 group cursor-pointer">
-                  <span class="font-label font-bold text-sm">{sections.joinCard.buttonText}</span>
-                  <span class="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">chevron_right</span>
-                </div>
+              <div class="relative z-[2] flex items-center gap-3 font-mono text-[11px] text-on-dark-muted tracking-wider">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF5F00" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                <span>{sections.eventCard.date}</span>
               </div>
-            )}
+            </div>
+          )}
+          {sections.joinCard && (
+            <div class="bg-orange text-white rounded-3xl p-10 md:p-14 flex flex-col justify-between min-h-[280px] relative overflow-hidden">
+              <!-- Subtle pattern -->
+              <div class="absolute inset-0 opacity-10" aria-hidden="true">
+                <svg width="100%" height="100%" class="absolute inset-0">
+                  <pattern id="diag" width="40" height="40" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                    <line x1="0" y1="0" x2="0" y2="40" stroke="white" stroke-width="0.5"/>
+                  </pattern>
+                  <rect width="100%" height="100%" fill="url(#diag)"/>
+                </svg>
+              </div>
+              <h4 class="font-display text-3xl md:text-4xl font-600 leading-tight relative z-[2]">{sections.joinCard.title}</h4>
+              <div class="flex items-center gap-3 cursor-pointer group relative z-[2]">
+                <span class="font-display font-500 text-base">{sections.joinCard.buttonText}</span>
+                <svg class="group-hover:translate-x-2 transition-transform duration-300" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
+    )}
+
+
+    <!-- ═══════════════════════════════════════
+         CTA / NEWSLETTER — Mesh bg, bold type
+    ═══════════════════════════════════════ -->
+    {page?.ctaTitle && page.ctaStyle === 'newsletter' && (
+      <section class="mesh-dark grain relative py-28 md:py-40 px-6 md:px-10 overflow-hidden">
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-orange/8 blur-[200px] rounded-full pointer-events-none pulse-glow"></div>
+
+        <div class="relative z-[3] max-w-3xl">
+          <span class="section-label text-orange-light">05 — Connect</span>
+          <h2 class="font-display text-5xl md:text-8xl font-700 tracking-tight text-on-dark leading-[0.85] mt-6">{page.ctaTitle}</h2>
+          <p class="text-on-dark-muted text-lg leading-relaxed mt-6 mb-12 max-w-md">{page.ctaDescription}</p>
+
+          <div class="max-w-md">
+            <div class="flex items-center bg-white/5 backdrop-blur-xl border border-white/10 rounded-full overflow-hidden hover:border-orange/30 transition-colors duration-500">
+              <input
+                class="flex-grow py-4 px-6 text-sm font-body text-on-dark placeholder:text-on-dark-faint bg-transparent focus:outline-none"
+                placeholder="Enter your business email"
+                type="email"
+              />
+              <button class="bg-orange hover:bg-orange-dim text-white m-1.5 px-6 py-3 rounded-full font-display text-sm font-500 cursor-pointer transition-all duration-300 whitespace-nowrap hover:shadow-[0_0_30px_rgba(255,95,0,0.3)]">
+                {page.ctaButtonText}
+              </button>
+            </div>
+            <p class="mt-4 font-mono text-[10px] tracking-wider text-on-dark-faint ml-6">Join 15,000+ marketers. No spam.</p>
           </div>
         </div>
       </section>
     )}
 
-    <!-- CTA Section -->
-    {page?.ctaTitle && page.ctaStyle === 'newsletter' && (
-      <section class="py-32 relative overflow-hidden">
-        <div class="max-w-4xl mx-auto px-6 text-center relative z-10">
-          <h2 class="font-headline text-5xl md:text-6xl font-bold mb-8 text-on-surface tracking-tight" set:html={page.ctaTitle.replace('augmented', '<span class="text-primary italic">augmented</span>')} />
-          <p class="text-xl text-on-surface-variant mb-12 leading-relaxed">{page.ctaDescription}</p>
-          <div class="max-w-md mx-auto relative">
-            <input class="w-full bg-surface-container-lowest border-0 rounded-full py-5 px-8 shadow-2xl focus:ring-2 focus:ring-primary-container text-on-surface font-medium placeholder:text-on-surface-variant/40" placeholder="Enter your business email" type="email" />
-            <button class="absolute right-2 top-2 bg-primary-container text-on-primary-container px-6 py-3 rounded-full font-label font-bold text-xs uppercase tracking-widest hover:brightness-110 transition-all">{page.ctaButtonText}</button>
-          </div>
-        </div>
-        <div class="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-surface-container-low to-transparent"></div>
-      </section>
-    )}
   </main>
+
+  <!-- ═══════ SCRIPTS ═══════ -->
+  <script>
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+
+    /* ─────────────────────────────────────────────
+       HERO — Flowing magnetic field lines
+       Lines flow across the screen like a fluid.
+       Mouse acts as a vortex that warps the flow.
+    ───────────────────────────────────────────── */
+    (function heroCanvas() {
+      const canvas = document.getElementById('hero-canvas') as HTMLCanvasElement;
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d')!;
+      const section = document.getElementById('hero')!;
+      let w = 0, h = 0;
+      let mouse = { x: -9999, y: -9999, active: false };
+      let smoothMouse = { x: -9999, y: -9999 };
+
+      const LINE_COUNT = 40;
+      const STEP = 8;
+
+      function resize() {
+        const r = section.getBoundingClientRect();
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        w = r.width; h = r.height;
+        canvas.width = w * dpr; canvas.height = h * dpr;
+        canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      // Noise helper — simple layered sine approximation
+      function noise(x: number, y: number, t: number) {
+        return Math.sin(x * 0.003 + t * 0.0004) * 0.6
+             + Math.sin(y * 0.004 - t * 0.0003) * 0.4
+             + Math.sin((x + y) * 0.002 + t * 0.0005) * 0.3
+             + Math.cos(x * 0.005 - y * 0.003 + t * 0.0002) * 0.2;
+      }
+
+      function draw(time: number) {
+        ctx.clearRect(0, 0, w, h);
+
+        // Smooth mouse position for organic feel
+        if (mouse.active) {
+          smoothMouse.x += (mouse.x - smoothMouse.x) * 0.08;
+          smoothMouse.y += (mouse.y - smoothMouse.y) * 0.08;
+        } else {
+          smoothMouse.x += (-9999 - smoothMouse.x) * 0.02;
+          smoothMouse.y += (-9999 - smoothMouse.y) * 0.02;
+        }
+
+        for (let i = 0; i < LINE_COUNT; i++) {
+          const baseY = (h / (LINE_COUNT - 1)) * i;
+          const drift = Math.sin(time * 0.0003 + i * 0.7) * 25;
+          let px = -20;
+          let py = baseY + drift;
+
+          ctx.beginPath();
+          ctx.moveTo(px, py);
+
+          const maxSteps = Math.ceil((w + 40) / STEP);
+          for (let s = 0; s < maxSteps; s++) {
+            // Flow direction from noise field
+            const angle = noise(px, py, time) * 0.8;
+            let dx = Math.cos(angle) * STEP;
+            let dy = Math.sin(angle) * STEP * 0.6;
+
+            // Mouse vortex — swirl lines around cursor
+            const mx = px - smoothMouse.x;
+            const my = py - smoothMouse.y;
+            const mDist = Math.sqrt(mx * mx + my * my);
+            const RADIUS = 250;
+            if (mDist < RADIUS && mDist > 1) {
+              const strength = ((RADIUS - mDist) / RADIUS);
+              const curve = strength * strength * 4;
+              // Perpendicular push creates swirl
+              dx += (-my / mDist) * curve * STEP * 0.5;
+              dy += (mx / mDist) * curve * STEP * 0.5;
+            }
+
+            px += dx;
+            py += dy;
+            ctx.lineTo(px, py);
+
+            if (px > w + 40) break;
+          }
+
+          // Glow intensity — brighter near center, dimmer at edges
+          const verticalPos = baseY / h;
+          const edgeFade = 1 - Math.abs(verticalPos - 0.5) * 1.6;
+          const alpha = Math.max(0, 0.03 + edgeFade * 0.04 + Math.sin(time * 0.001 + i * 0.3) * 0.015);
+
+          ctx.strokeStyle = `rgba(255, 95, 0, ${alpha})`;
+          ctx.lineWidth = 1 + edgeFade * 0.5;
+          ctx.stroke();
+        }
+
+        // Glow hotspot at mouse
+        if (mouse.active) {
+          const grd = ctx.createRadialGradient(smoothMouse.x, smoothMouse.y, 0, smoothMouse.x, smoothMouse.y, 200);
+          grd.addColorStop(0, 'rgba(255, 95, 0, 0.06)');
+          grd.addColorStop(1, 'rgba(255, 95, 0, 0)');
+          ctx.fillStyle = grd;
+          ctx.fillRect(smoothMouse.x - 200, smoothMouse.y - 200, 400, 400);
+        }
+
+        if (!reducedMotion) requestAnimationFrame(draw);
+      }
+
+      section.addEventListener('mousemove', (e) => {
+        const r = section.getBoundingClientRect();
+        mouse.x = e.clientX - r.left;
+        mouse.y = e.clientY - r.top;
+        mouse.active = true;
+      });
+      section.addEventListener('mouseleave', () => { mouse.active = false; });
+      window.addEventListener('resize', resize);
+
+      resize();
+      if (!reducedMotion) requestAnimationFrame(draw); else draw(0);
+    })();
+
+
+    /* ─────────────────────────────────────────────
+       TOP RATED — Drifting aurora bands
+       Slow, ambient, horizontal light bands that
+       breathe and shift. No mouse interaction needed.
+    ───────────────────────────────────────────── */
+    (function ratedCanvas() {
+      const canvas = document.getElementById('rated-canvas') as HTMLCanvasElement;
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d')!;
+      const section = document.getElementById('top-rated')!;
+      let w = 0, h = 0;
+
+      interface Band {
+        y: number; amp: number; freq: number; speed: number;
+        alpha: number; width: number; phase: number;
+      }
+      const bands: Band[] = [];
+
+      function resize() {
+        const r = section.getBoundingClientRect();
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        w = r.width; h = r.height;
+        canvas.width = w * dpr; canvas.height = h * dpr;
+        canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      function init() {
+        resize();
+        bands.length = 0;
+        for (let i = 0; i < 6; i++) {
+          bands.push({
+            y: h * (0.1 + i * 0.16),
+            amp: 30 + Math.random() * 50,
+            freq: 0.001 + Math.random() * 0.002,
+            speed: 0.0002 + Math.random() * 0.0004,
+            alpha: 0.015 + Math.random() * 0.025,
+            width: 60 + Math.random() * 120,
+            phase: Math.random() * Math.PI * 2,
+          });
+        }
+      }
+
+      function draw(time: number) {
+        ctx.clearRect(0, 0, w, h);
+
+        for (const b of bands) {
+          const step = 12;
+          const points: {x: number; y: number}[] = [];
+
+          for (let x = -step; x <= w + step; x += step) {
+            const y = b.y
+              + Math.sin(x * b.freq + time * b.speed + b.phase) * b.amp
+              + Math.cos(x * b.freq * 0.6 + time * b.speed * 1.5 + b.phase * 2) * b.amp * 0.4;
+            points.push({ x, y });
+          }
+
+          // Draw as a filled gradient band
+          const halfW = b.width / 2;
+          ctx.beginPath();
+          ctx.moveTo(points[0].x, points[0].y - halfW);
+          for (let i = 1; i < points.length; i++) {
+            const xc = (points[i - 1].x + points[i].x) / 2;
+            const yc = (points[i - 1].y + points[i].y) / 2 - halfW;
+            ctx.quadraticCurveTo(points[i - 1].x, points[i - 1].y - halfW, xc, yc);
+          }
+          for (let i = points.length - 1; i >= 1; i--) {
+            const xc = (points[i].x + points[i - 1].x) / 2;
+            const yc = (points[i].y + points[i - 1].y) / 2 + halfW;
+            ctx.quadraticCurveTo(points[i].x, points[i].y + halfW, xc, yc);
+          }
+          ctx.closePath();
+
+          const grd = ctx.createLinearGradient(0, b.y - halfW, 0, b.y + halfW);
+          grd.addColorStop(0, 'rgba(255, 95, 0, 0)');
+          grd.addColorStop(0.35, `rgba(255, 95, 0, ${b.alpha * 0.7})`);
+          grd.addColorStop(0.5, `rgba(255, 95, 0, ${b.alpha})`);
+          grd.addColorStop(0.65, `rgba(255, 95, 0, ${b.alpha * 0.7})`);
+          grd.addColorStop(1, 'rgba(255, 95, 0, 0)');
+          ctx.fillStyle = grd;
+          ctx.fill();
+        }
+
+        if (!reducedMotion) requestAnimationFrame(draw);
+      }
+
+      window.addEventListener('resize', () => { init(); });
+      init();
+      if (!reducedMotion) requestAnimationFrame(draw); else draw(0);
+    })();
+  </script>
 </Layout>

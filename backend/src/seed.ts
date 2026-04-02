@@ -83,9 +83,9 @@ export default async function seed({ strapi }) {
   // ── Agencies ──
   const agencies = [
     {
-      name: 'SearchMatrix Labs',
-      slug: 'searchmatrix-labs',
-      description: 'Pioneers in integrating OpenAI\'s latest models into corporate digital ecosystems, achieving 300% growth for SaaS clients.',
+      name: 'TJ Digital',
+      slug: 'tj-digital',
+      description: 'Founded by TJ Robertson, a Las Vegas-based SEO veteran with 15 years of experience. TJ Digital specializes in AI-driven search strategy, LLM optimization, and predictive analytics for enterprise brands.',
       rating: 5.0,
       badge: 'Premier Agency',
       badgeStyle: 'premier',
